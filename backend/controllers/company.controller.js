@@ -35,13 +35,16 @@ export const getCompany = async (req,res) =>{
     try {
         const userId = req.id; // logged in user id
         const companies = await Company.find({userId});
-        if(companies){
+        if(!companies){
             return res.status(404).json({
                 message:"Companies not found",
                 success:false
             })
         }
-
+    return res.status(200).json({
+        companies,
+        success:true
+    })
     } catch (error) {
         console.log(error)
     }
