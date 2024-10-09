@@ -2,6 +2,7 @@
 node_modules/
 
 
-# Ignore environment variables
-backend/.env
+# Ignore all .env files in any folder
+**/.env
+
 
