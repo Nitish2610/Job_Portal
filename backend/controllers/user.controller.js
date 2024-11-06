@@ -1,7 +1,8 @@
 import { User } from "../models/user.model.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
-
+import getDataUri from "../utils/datauri.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const register = async (req, res) => {
   try {
@@ -12,6 +13,10 @@ export const register = async (req, res) => {
         success: false,
       });
     }
+    const file = req.file;
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
     const user = await User.findOne({ email });
     if (user) {
       return res.status(400).json({
@@ -27,6 +32,9 @@ export const register = async (req, res) => {
       phoneNumber,
       password: hashedPassword,
       role,
+      profile: {
+        profilePhoto: cloudResponse.secure_url,
+      },
     });
     return res.status(201).json({
       message: "Account Created Successfully",
@@ -80,7 +88,7 @@ export const login = async (req, res) => {
       email: user.email,
       phoneNumber: user.phoneNumber,
       role: user.role,
-      profile: user.profile
+      profile: user.profile,
     };
 
     return res
@@ -114,12 +122,14 @@ export const logout = async (req, res) => {
 export const updateProfile = async (req, res) => {
   try {
     const { fullname, email, phoneNumber, bio, skills } = req.body;
-    const file = req.file;
-   
+
     //cloudinary comes here
-    
-     let skillsArray;
-    if(skills){
+    const file = req.file;
+    const fileUri = getDataUri(file);
+    const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
+
+    let skillsArray;
+    if (skills) {
       skillsArray = skills.split(",");
     }
     const userId = req.id; // middlewares authentication
@@ -133,28 +143,32 @@ export const updateProfile = async (req, res) => {
 
     //updating data
 
-     if(fullname) user.fullname = fullname
-      if(email) user.email = email
-      if(phoneNumber) user.phoneNumber = phoneNumber
-      if(bio) user.profile.bio = bio
-      if(skills) user.profile.skills = skillsArray
+    if (fullname) user.fullname = fullname;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (bio) user.profile.bio = bio;
+    if (skills) user.profile.skills = skillsArray;
 
-      //resumes come later here
+    //resumes come later here
+    if (cloudResponse) {
+      user.profile.resume = cloudResponse.secure_url; //save the cloudinary url
+      user.profile.resumeOriginalName = file.originalname; //save the original file
+    }
 
-      await user.save();
-      user = {
-        _id: user._id,
-        fullname: user.fullname,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
-        profile: user.profile,
-      };
-      return res.status(200).json({
-        message:"Profile updated successfully",
-        user,
-        success:true
-      })
+    await user.save();
+    user = {
+      _id: user._id,
+      fullname: user.fullname,
+      email: user.email,
+      phoneNumber: user.phoneNumber,
+      role: user.role,
+      profile: user.profile,
+    };
+    return res.status(200).json({
+      message: "Profile updated successfully",
+      user,
+      success: true,
+    });
   } catch (error) {
     console.log(error);
   }
