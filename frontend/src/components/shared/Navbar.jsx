@@ -70,19 +70,33 @@ const Navbar = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <Avatar className="cursor-pointer">
-                  <AvatarImage
-                    src={user?.profile?.profilePhoto}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
+                  {user?.profile?.profilePhoto ? (
+                    <AvatarImage
+                      src={user?.profile?.profilePhoto}
+                      alt="@shadcn"
+                      className="w-12 h-12 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white text-lg font-semibold">
+                      @
+                    </div>
+                  )}
                 </Avatar>
               </PopoverTrigger>
               <PopoverContent className="w-50">
                 <div className="flex gap-4 space-y-2">
                   <Avatar className="cursor-pointer">
-                    <AvatarImage
-                      src={user?.profile?.profilePhoto}
-                      className="w-12 h-12 rounded-full object-cover"
-                    />
+                    {user?.profile?.profilePhoto ? (
+                      <AvatarImage
+                        src={user?.profile?.profilePhoto}
+                        alt="@shadcn"
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center text-white text-lg font-semibold">
+                        @
+                      </div>
+                    )}
                   </Avatar>
                   <div>
                     <h4 className="font-medium">{user?.fullname}</h4>
