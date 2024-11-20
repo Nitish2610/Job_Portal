@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState,useEffect } from "react";
 import Navbar from "../shared/Navbar";
 import { Label } from "@radix-ui/react-label";
 import { RadioGroup } from "@radix-ui/react-radio-group";
@@ -21,7 +21,7 @@ const Login = () => {
   const navigate = useNavigate();
 
   const dispatch = useDispatch();
-  const { loading } = useSelector((store) => store.auth);
+  const { loading, user } = useSelector((store) => store.auth);
 
   const changeEventHandler = (e) => {
     setInput({ ...input, [e.target.name]: e.target.value });
@@ -49,6 +49,11 @@ const Login = () => {
       dispatch(setLoading(false));
     }
   };
+  useEffect(()=>{
+    if(user){
+        navigate("/");
+    }
+},[])
 
   return (
     <div>
